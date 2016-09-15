@@ -13,3 +13,20 @@ Usage: show-prs [-s] [-f value] [-o value] [-p value] [-t value] [parameters ...
 EXAMPLE
 ---------
 ./show-prs --send --from "user@example.com" --to "group@example.com" -p project1 -p projectN --org githubuser
+
+INSTALL
+--------
+Use go get to install the program. It will be located in ```$GOPATH/bin```
+
+```
+go get github.com/jmrodri/show-prs
+```
+
+MANUAL BUILD
+---------------
+```
+git clone https://github.com/jmrodri/show-prs.git
+cd show-prs
+go build
+./show-prs
+```
