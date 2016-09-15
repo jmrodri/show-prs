@@ -1,3 +1,22 @@
+/*
+ * main.go (show-prs) - list open pull requests from your github project
+ *
+ * Copyright (C) 2016 Jesus M. Rodriguez
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
 package main
 
 import (
@@ -21,6 +40,11 @@ func processProject(client *github.Client, org string, project string) string {
 	if err != nil {
 		fmt.Println("error listing prs", err)
 		os.Exit(1)
+	}
+
+	if len(prs) <= 0 {
+		// nothing to send
+		return ""
 	}
 
 	var msg string
@@ -94,7 +118,13 @@ func main() {
 	for _, project := range projects {
 		msg := processProject(client, org, project)
 		if send {
-			sendEmail(from, to, project, msg)
+			// we could optimize this to be if send && msg but
+			// then that triggers the else block printing an empty string.
+			//
+			// only send email if we actually have a message to send
+			if msg != "" {
+				sendEmail(from, to, project, msg)
+			}
 		} else {
 			fmt.Println(msg)
 		}
