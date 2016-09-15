@@ -55,7 +55,7 @@ func sendEmail(from_addr string, to_addr string, project string, msg string) {
 		os.Exit(1)
 	}
 	defer wc.Close()
-	buf := bytes.NewBufferString("Subject: PR report for:" + project + "\n" + msg)
+	buf := bytes.NewBufferString("Subject: PR report for: " + project + "\n" + msg)
 	if _, err = buf.WriteTo(wc); err != nil {
 		fmt.Println("Could not write message", err)
 	}
