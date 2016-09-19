@@ -52,10 +52,10 @@ func processProject(client *github.Client, org string, project string) string {
 	footer := ""
 
 	for _, pr := range prs {
-		// Title, User, URL
+		// Title, User, HTMLURL
 		// string, string, string
 		// TODO: consider using a template
-		msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\n---\n", *pr.Title, *pr.User.Login, *pr.URL)
+		msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\n---\n", *pr.Title, *pr.User.Login, *pr.HTMLURL)
 	}
 
 	return buildMsg(heading, msg, footer)
