@@ -27,6 +27,8 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/oauth2"
+
 	"github.com/google/go-github/github"
 	"github.com/pborman/getopt"
 )
@@ -91,12 +93,14 @@ func main() {
 	getopt.StringLong("to", 't', "", "Recipient email address")
 	getopt.StringLong("org", 'o', "fusor", "org")
 	getopt.ListLong("project", 'p', "Project")
+	getopt.StringLong("token", 'a', "", "Token")
 
 	getopt.Parse()
 
 	org := getopt.GetValue("org")
 	to := getopt.GetValue("to")
 	from := getopt.GetValue("from")
+	token := getopt.GetValue("token")
 	projects := strings.Split(getopt.GetValue("project"), ",")
 	send, _ := strconv.ParseBool(getopt.GetValue("send"))
 
@@ -113,7 +117,12 @@ func main() {
 		projects = []string{"fusor"}
 	}
 
-	client := github.NewClient(nil)
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(oauth2.NoContext, ts)
+
+	client := github.NewClient(tc)
 
 	for _, project := range projects {
 		msg := processProject(client, org, project)
