@@ -22,6 +22,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	"net/smtp"
 	"os"
 	"strconv"
@@ -117,10 +118,14 @@ func main() {
 		projects = []string{"fusor"}
 	}
 
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	var tc *http.Client
+
+	if token != "" {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		tc = oauth2.NewClient(oauth2.NoContext, ts)
+	}
 
 	client := github.NewClient(tc)
 
