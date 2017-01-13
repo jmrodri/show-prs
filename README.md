@@ -2,13 +2,15 @@
 
 ```
 $ ./show-prs --help
-Usage: show-prs [-s] [-f value] [-o value] [-p value] [-t value] [parameters ...]
- -f, --from=value  Sender email address
- -o, --org=value   org
+Usage: show-prs [-s] [-a value] [-f value] [-o value] [-p value] [-t value] [parameters ...]
+ -a, --token=value  Token
+ -f, --from=value   Sender email address
+ -o, --org=value    org
  -p, --project=value
-                   Project
+                    Project
  -s, --send
- -t, --to=value    Recipient email address
+ -t, --to=value     Recipient email address
+
 ```
 EXAMPLE
 ---------
