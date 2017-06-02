@@ -21,6 +21,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/smtp"
@@ -38,8 +39,8 @@ func buildMsg(header string, msg string, footer string) string {
 	return fmt.Sprintf("%s\n\n%s\n%s\n", header, msg, footer)
 }
 
-func processProject(client *github.Client, org string, project string) string {
-	prs, _, err := client.PullRequests.List(org, project, nil)
+func processProject(ctx context.Context, client *github.Client, org string, project string) string {
+	prs, _, err := client.PullRequests.List(ctx, org, project, nil)
 	if err != nil {
 		fmt.Println("error listing prs", err)
 		os.Exit(1)
@@ -128,9 +129,10 @@ func main() {
 	}
 
 	client := github.NewClient(tc)
+	ctx := context.Background()
 
 	for _, project := range projects {
-		msg := processProject(client, org, project)
+		msg := processProject(ctx, client, org, project)
 		if send {
 			// we could optimize this to be if send && msg but
 			// then that triggers the else block printing an empty string.
