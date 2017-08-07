@@ -17,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
 package main
 
 import (
@@ -39,6 +40,30 @@ func buildMsg(header string, msg string, footer string) string {
 	return fmt.Sprintf("%s\n\n%s\n%s\n", header, msg, footer)
 }
 
+func generateGroupEmail(prs []*github.PullRequest) string {
+	var msg string
+	heading := "We still have OPEN PRs to be reviewed:"
+	footer := ""
+
+	for _, pr := range prs {
+		// Title, User, HTMLURL
+		// string, string, string
+		// TODO: consider using a template
+		msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\n---\n", *pr.Title, *pr.User.Login, *pr.HTMLURL)
+	}
+
+	return buildMsg(heading, msg, footer)
+}
+
+/*
+func getReviewers(ctx context.Context, client *github.Client, org string, project string, prnum int) ([]*User, err) {
+	reviewers, _, err := client.PullRequests.ListReviewers(ctx, org, project, prnum, nil)
+	for _, reviewer := range reviewers {
+		fmt.Printf("%s <%s>\n", reviewer.Name, reviewer.Email)
+	}
+}
+*/
+
 func processProject(ctx context.Context, client *github.Client, org string, project string) string {
 	prs, _, err := client.PullRequests.List(ctx, org, project, nil)
 	if err != nil {
@@ -59,7 +84,29 @@ func processProject(ctx context.Context, client *github.Client, org string, proj
 		// Title, User, HTMLURL
 		// string, string, string
 		// TODO: consider using a template
-		msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\n---\n", *pr.Title, *pr.User.Login, *pr.HTMLURL)
+
+		//fmt.Printf("PR: number [%v]\n", *pr.Number)
+
+		reviewers, _, err := client.PullRequests.ListReviewers(ctx, org, project, *pr.Number, nil)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		var reviewstring string
+		for i, reviewer := range reviewers {
+			if i == 0 && *reviewer.Login != "" {
+				reviewstring += fmt.Sprintf(" %s\n", *reviewer.Login)
+			} else {
+				// account for the length of "reviewer"
+				reviewstring += fmt.Sprintf("           %s\n", *reviewer.Login)
+			}
+		}
+
+		if reviewstring == "" {
+			msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\nreviewers: None\n\n---\n", *pr.Title, *pr.User.Login, *pr.HTMLURL)
+		} else {
+			msg += fmt.Sprintf("%s\tauthor: (%s)\n%s\nreviewers:%s\n---\n", *pr.Title, *pr.User.Login, *pr.HTMLURL, reviewstring)
+		}
 	}
 
 	return buildMsg(heading, msg, footer)
